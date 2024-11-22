@@ -1,101 +1,283 @@
-import Image from "next/image";
+"use client"
+
+import { useState, useEffect } from "react";
+import { useRouter } from "next/navigation";
+import axios from "axios";
+
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@/components/ui/alert-dialog"
+import { Button } from "@/components/ui/button"
+
+interface data{
+    URL1: string,
+    URL2: string,
+    name1: string,
+    name2: string,
+    img: string,
+    type: string
+
+}
 
 export default function Home() {
-  return (
-    <div className="grid grid-rows-[20px_1fr_20px] items-center justify-items-center min-h-screen p-8 pb-20 gap-16 sm:p-20 font-[family-name:var(--font-geist-sans)]">
-      <main className="flex flex-col gap-8 row-start-2 items-center sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={180}
-          height={38}
-          priority
-        />
-        <ol className="list-inside list-decimal text-sm text-center sm:text-left font-[family-name:var(--font-geist-mono)]">
-          <li className="mb-2">
-            Get started by editing{" "}
-            <code className="bg-black/[.05] dark:bg-white/[.06] px-1 py-0.5 rounded font-semibold">
-              app/page.tsx
-            </code>
-            .
-          </li>
-          <li>Save and see your changes instantly.</li>
-        </ol>
 
-        <div className="flex gap-4 items-center flex-col sm:flex-row">
-          <a
-            className="rounded-full border border-solid border-transparent transition-colors flex items-center justify-center bg-foreground text-background gap-2 hover:bg-[#383838] dark:hover:bg-[#ccc] text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={20}
-              height={20}
-            />
-            Deploy now
-          </a>
-          <a
-            className="rounded-full border border-solid border-black/[.08] dark:border-white/[.145] transition-colors flex items-center justify-center hover:bg-[#f2f2f2] dark:hover:bg-[#1a1a1a] hover:border-transparent text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 sm:min-w-44"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Read our docs
-          </a>
+  const router = useRouter();
+
+  const [name, setName] = useState("");
+  const [data, setData] = useState<data[]>([])
+  const [loading, setLoading] = useState(false)
+  const [URL1, setURL1] = useState("");
+  const [URL2, setURL2] = useState("");
+  const [category, setCategory] = useState("");
+
+  const [fetchedName, setfetchedName] = useState("")
+  const [fetchedURL1, setfetchedURL1] = useState("")
+  const [fetchedURL2, setfetchedURL2] = useState("")
+  const [fetchedPrice1, setfetchedPrice1] = useState("")
+  const [fetchedPrice2, setfetchedPrice2] = useState("")
+  const [fetchedImage, setfetchedImage] = useState("")
+
+  const [fetchloading, setFetchLoading] = useState(false)
+
+  useEffect( () => {
+    ( async () => {
+      setLoading(true)
+      const response: any = await axios.get('http://127.0.0.1:5000/getProducts')
+      setData(response.data)
+      setLoading(false)
+    })()
+
+  }, [])
+
+  const getProducts = async () => {
+    if(name){
+      setLoading(true)
+      setData([])
+      const response: any = await axios.get('http://127.0.0.1:5000/getProducts/'+name)
+      setData(response.data)
+      setLoading(false) 
+    } else {
+      setLoading(true)
+      setData([])
+      const response: any = await axios.get('http://127.0.0.1:5000/getProducts')
+      setData(response.data)
+      setLoading(false)
+    }
+  }
+
+  const addToDatabase = async () => {
+    if((URL1 != "") && (URL2 != "") && (category != "")){
+      const response = await axios.post("http://127.0.0.1:5000/addToDatabase", {
+        URL1,
+        URL2,
+        category     
+      })
+    }
+  }
+
+  const getDetails = async (url1: string, url2: string) => {
+    setFetchLoading(true);
+    const response = await axios.post("http://127.0.0.1:5000/getDetails", {
+      url1,
+      url2     
+    })
+    setfetchedName(response.data[1])
+    setfetchedPrice1(response.data[0])
+    setfetchedPrice2(response.data[2])
+    setfetchedImage(response.data[3])
+    setfetchedURL1(response.data[4])
+    setfetchedURL2(response.data[5])
+    setFetchLoading(false);
+
+  }
+
+  return (
+    <div className="flex">
+      <div className="h-screen w-full border border-black">
+        <div className="p-3 flex justify-center">
+            <input type="text" className="bg-transparent border border-black" value={name} onChange={(e) => setName(e.target.value)}/>
+            <button className="" onClick={getProducts}>
+              Search
+            </button>
         </div>
-      </main>
-      <footer className="row-start-3 flex gap-6 flex-wrap items-center justify-center">
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/file.svg"
-            alt="File icon"
-            width={16}
-            height={16}
+        <div className="border-black border m-4 p-6 h-5/6 overflow-y-auto">
+          
+          {
+            loading &&
+            <div>
+              Loading ...
+            </div>
+          }
+
+          {
+            data.map((element, index) => {
+              return <div className="flex justify-center items-center m-3 p-2 h-1/4 border border-black hover:bg-slate-500 transition-all duration-150 cursor-pointer" key={index} onClick={() => getDetails(element.URL1, element.URL2)}>
+                <div className="flex justify-center items-center w-1/3 p-1">
+                  <img className="w-1/2" src={element.img} alt="No image" />
+                </div>
+                <div className="flex justify-center items-center w-2/3 p-1">
+                  {element.name1}
+                </div>
+              </div>
+            })
+          }
+          {
+            data.length !== 0 && 
+          <div className="text-center">
+              <div className="flex justify-center items-center">
+                <div className="border border-black w-1/2 mt-10 p-5">
+                  Want to add something ?
+                  <div className="p-3">
+                    <AlertDialog>
+                      <AlertDialogTrigger asChild>
+                        <Button variant="outline">Add</Button>
+                      </AlertDialogTrigger>
+                      <AlertDialogContent>
+                        <AlertDialogHeader>
+                          <AlertDialogTitle>Provide the details</AlertDialogTitle>
+                          <AlertDialogDescription>
+                            <div className="flex m-1">
+                              <div className="p-1">
+                                URL1
+                              </div>
+                              <input type="text" className="border border-black" value={URL1} onChange={(e) => setURL1(e.target.value)}/>
+                            </div>
+                            <div className="flex m-1">
+                              <div className="p-1">
+                                URL2
+                              </div>
+                              <input type="text" className="border border-black" value={URL2} onChange={(e) => setURL2(e.target.value)}/>
+                            </div>
+                            <div className="flex">
+                              <div className="p-1">
+                                Category
+                              </div>
+                              <input type="text" className="border border-black" value={category} onChange={(e) => setCategory(e.target.value)}/>
+                            </div>
+                          </AlertDialogDescription>
+                        </AlertDialogHeader>
+                        <AlertDialogFooter>
+                          <AlertDialogAction onClick={addToDatabase}>Add</AlertDialogAction>
+                        </AlertDialogFooter>
+                      </AlertDialogContent>
+                    </AlertDialog>
+                  </div>
+                </div>
+              </div>
+            </div>
+          }
+
+
+          {
+            !data.length && !loading &&
+            <div className="text-center">
+              <div>
+                No item found
+              </div>
+              <div className="flex justify-center items-center">
+                <div className="border border-black w-1/2 mt-10 p-5">
+                  Want to add something ?
+                  <div className="p-3">
+                    <AlertDialog>
+                      <AlertDialogTrigger asChild>
+                        <Button variant="outline">Add</Button>
+                      </AlertDialogTrigger>
+                      <AlertDialogContent>
+                        <AlertDialogHeader>
+                          <AlertDialogTitle>Provide the details</AlertDialogTitle>
+                          <AlertDialogDescription>
+                            <div className="flex m-1">
+                              <div className="p-1">
+                                URL1
+                              </div>
+                              <input type="text" className="border border-black" value={URL1} onChange={(e) => setURL1(e.target.value)}/>
+                            </div>
+                            <div className="flex m-1">
+                              <div className="p-1">
+                                URL2
+                              </div>
+                              <input type="text" className="border border-black" value={URL2} onChange={(e) => setURL2(e.target.value)}/>
+                            </div>
+                            <div className="flex">
+                              <div className="p-1">
+                                Category
+                              </div>
+                              <input type="text" className="border border-black" value={category} onChange={(e) => setCategory(e.target.value)}/>
+                            </div>
+                          </AlertDialogDescription>
+                        </AlertDialogHeader>
+                        <AlertDialogFooter>
+                          <AlertDialogAction onClick={addToDatabase}>Add</AlertDialogAction>
+                        </AlertDialogFooter>
+                      </AlertDialogContent>
+                    </AlertDialog>
+                  </div>
+                </div>
+              </div>
+            </div>
+          }
+        </div>
+      </div>
+      { 
+        !fetchloading && 
+        <div className="h-screen w-full border border-black">
+                  
+        <div className="flex flex-col items-center justify-center min-h-screen bg-gray-100">
+
+          <img
+            src={fetchedImage}
           />
-          Learn
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/window.svg"
-            alt="Window icon"
-            width={16}
-            height={16}
-          />
-          Examples
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/globe.svg"
-            alt="Globe icon"
-            width={16}
-            height={16}
-          />
-          Go to nextjs.org →
-        </a>
-      </footer>
+
+          {/* Product Name */}
+          <h1 className="text-2xl text-center font-bold mt-6">{fetchedName}</h1>
+
+          {/* Price Comparisons */}
+          <div className="mt-6 space-y-4 w-full max-w-sm">
+            
+              <div
+                className="flex flex-col items-center border p-4 rounded-lg shadow-md bg-white hover:bg-slate-300 active:bg-slate-500 cursor-pointer"
+                onClick={ () => {
+                  if(fetchedURL1){
+                    window.open(fetchedURL1, "_blank", "noopener,noreferrer")
+                  }
+                } }
+              >
+                
+                <p className="text-gray-700 text-sm my-2">Flipkart - {fetchedPrice1}</p>
+                
+              </div>
+
+              <div
+                className="flex flex-col items-center border p-4 rounded-lg shadow-md bg-white hover:bg-slate-300 active:bg-slate-500 cursor-pointer"
+                onClick={ () => {
+                  if(fetchedURL2){
+                    window.open(fetchedURL2, "_blank", "noopener,noreferrer")
+                  }
+                } }
+              > 
+                <p className="text-gray-700 text-sm my-2">Croma - {fetchedPrice2}</p>
+                
+              </div>
+            
+          </div>
+        </div>
+
+        </div>
+      }
+
+      {
+        fetchloading && <div className="text-center h-screen w-full border border-black">
+          Fetching Data ...
+        </div>
+      }
+      
     </div>
   );
 }
