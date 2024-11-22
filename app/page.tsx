@@ -145,13 +145,13 @@ export default function Home() {
                           <AlertDialogDescription>
                             <div className="flex m-1">
                               <div className="p-1">
-                                URL1
+                                Flipkart URL
                               </div>
                               <input type="text" className="border border-black" value={URL1} onChange={(e) => setURL1(e.target.value)}/>
                             </div>
                             <div className="flex m-1">
                               <div className="p-1">
-                                URL2
+                                Croma URL
                               </div>
                               <input type="text" className="border border-black" value={URL2} onChange={(e) => setURL2(e.target.value)}/>
                             </div>
@@ -195,13 +195,13 @@ export default function Home() {
                           <AlertDialogDescription>
                             <div className="flex m-1">
                               <div className="p-1">
-                                URL1
+                                Flipkart URL
                               </div>
                               <input type="text" className="border border-black" value={URL1} onChange={(e) => setURL1(e.target.value)}/>
                             </div>
                             <div className="flex m-1">
                               <div className="p-1">
-                                URL2
+                                Croma URL
                               </div>
                               <input type="text" className="border border-black" value={URL2} onChange={(e) => setURL2(e.target.value)}/>
                             </div>
@@ -230,10 +230,13 @@ export default function Home() {
         <div className="h-screen w-full border border-black">
                   
         <div className="flex flex-col items-center justify-center min-h-screen bg-gray-100">
+          {
+            fetchedImage &&
+              <img
+                src={fetchedImage}
+              />
 
-          <img
-            src={fetchedImage}
-          />
+          }
 
           {/* Product Name */}
           <h1 className="text-2xl text-center font-bold mt-6">{fetchedName}</h1>
